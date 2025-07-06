@@ -1,0 +1,51 @@
+from flask import Flask, request, jsonify
+import hashlib
+import time
+import requests
+
+app = Flask(__name__)
+
+APP_KEY = "516592"
+APP_SECRET = "ZSbP1R2mTCcTK1MDMXX4f0mB0mywQcAH"
+TRACKING_ID = "default"
+
+def sign(params):
+    sorted_params = sorted(params.items())
+    query_string = "".join(f"{k}{v}" for k, v in sorted_params)
+    raw_string = APP_SECRET + query_string + APP_SECRET
+    return hashlib.md5(raw_string.encode('utf-8')).hexdigest().upper()
+
+@app.route("/generate", methods=["GET"])
+def generate_affiliate_link():
+    origin_url = request.args.get("url")
+    if not origin_url:
+        return jsonify({"error": "Missing 'url' parameter"}), 400
+
+    timestamp = str(int(time.time() * 1000))
+    method = "aliexpress.affiliate.link.generate"
+
+    params = {
+        "app_key": APP_KEY,
+        "method": method,
+        "timestamp": timestamp,
+        "format": "json",
+        "v": "2.0",
+        "sign_method": "md5",
+        "tracking_id": TRACKING_ID,
+        "promotion_link_type": "cm",
+        "source_values": origin_url
+    }
+
+    signature = sign(params)
+    params["sign"] = signature
+
+    url = "https://api-sg.aliexpress.com/openapi/param2/2/portals.open/api.link.generate"
+    response = requests.get(url, params=params)
+
+    try:
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({"error": "Failed to parse response", "details": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=3000)
