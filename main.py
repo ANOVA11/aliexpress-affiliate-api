@@ -7,10 +7,9 @@ app = Flask(__name__)
 
 import os
 
-APP_KEY = os.environ.get("APP_KEY")
-APP_SECRET = os.environ.get("APP_SECRET")
-TRACKING_ID = os.environ.get("TRACKING_ID")
-
+print("APP_KEY:", APP_KEY)
+print("APP_SECRET:", APP_SECRET)
+print("TRACKING_ID:", TRACKING_ID)
 
 def sign(params):
     sorted_params = sorted(params.items())
