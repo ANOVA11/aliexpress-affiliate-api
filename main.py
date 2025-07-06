@@ -2,11 +2,16 @@ from flask import Flask, request, jsonify
 import hashlib
 import time
 import requests
+import os  # ✅ ضعه في الأعلى
+
+# ✅ قراءة المتغيرات من بيئة Render
+APP_KEY = os.environ.get("APP_KEY")
+APP_SECRET = os.environ.get("APP_SECRET")
+TRACKING_ID = os.environ.get("TRACKING_ID")
 
 app = Flask(__name__)
 
-import os
-
+# (اختياري) اطبع القيم للمراجعة (ثم احذفها لاحقًا بعد التأكد)
 print("APP_KEY:", APP_KEY)
 print("APP_SECRET:", APP_SECRET)
 print("TRACKING_ID:", TRACKING_ID)
@@ -15,7 +20,7 @@ def sign(params):
     sorted_params = sorted(params.items())
     query_string = "".join(f"{k}{v}" for k, v in sorted_params)
     raw_string = APP_SECRET + query_string + APP_SECRET
-    return hashlib.md5(raw_string.encode('utf-8')).hexdigest().upper()
+    return hashlib.md5(raw_string.encode("utf-8")).hexdigest().upper()
 
 @app.route("/generate", methods=["GET"])
 def generate_affiliate_link():
