@@ -5,9 +5,12 @@ import requests
 
 app = Flask(__name__)
 
-APP_KEY = "516592"
-APP_SECRET = "ZSbP1R2mTCcTK1MDMXX4f0mB0mywQcAH"
-TRACKING_ID = "default"
+import os
+
+APP_KEY = os.environ.get("APP_KEY")
+APP_SECRET = os.environ.get("APP_SECRET")
+TRACKING_ID = os.environ.get("TRACKING_ID")
+
 
 def sign(params):
     sorted_params = sorted(params.items())
